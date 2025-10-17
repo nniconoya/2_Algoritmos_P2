@@ -32,6 +32,14 @@ void listar_vector(int v[], int n) {
     }
 }
 
+int esta_ordenado(int v[], int n) {
+    int i;
+    for (i = 1; i < n; i++) {
+        if (v[i-1] > v[i]) return 0;
+    }
+    return 1;
+}
+
 void revertir_vector(int v[], int n) {
     int i, aux;
 
@@ -214,17 +222,25 @@ void insercion_test() {
     aleatorio(v_rand, n);
     printf("Inicializacion aleatoria\n");
     listar_vector(v_rand, n);
+    printf("\nOrdenado? %d\n", esta_ordenado(v_rand, n));
+
 
     ord_ins(v_rand, n);
     printf("\nOrdenacion por Insercion\n");
     listar_vector(v_rand, n);
+    printf("\nOrdenado? %d\n", esta_ordenado(v_rand, n));
+
 
     printf("\nInicializacion descendente\n");
     listar_vector(v_desc, 10);
+    printf("\nOrdenado? %d\n", esta_ordenado(v_desc, 10));
+
 
     ord_ins(v_desc, 10);
     printf("\nOrdenacion por Insercion\n");
     listar_vector(v_desc, 10);
+    printf("\nOrdenado? %d\n", esta_ordenado(v_desc, 10));
+
 
     insercion_tiempos();
 }
@@ -234,15 +250,68 @@ void shell_test() {
     int m_hibbard = 50, m_knuth = 50, m_sedgewick = 50, m_ciura = 50;
     int v[32000];
     int inc[50];
+    double tb, ta;
 
-    rellenar_v_hibbard(inc, &m_hibbard, n);
+    printf("\nOrdenacion por Shell | Hibbard\n");
+    printf("%11sn%12st(n)%10st(n)/n%4st(n)/n^(5/4)%8st(n)/n^2\n", "", "", "", "", "");
+    while (n <= 32000) {
+        aleatorio(v, n);
+        rellenar_v_hibbard(inc, &m_hibbard, n);
+        tb = microsegundos();
+        ord_shell(v, n, inc, m_hibbard);
+        ta = microsegundos();
+        printf("%12d\t%12.3f\t%12.8f\t%12.8f\t%12.8f\n", n, ta - tb, 
+                                                        (ta - tb) / n,
+                                                        (ta - tb) / pow(n, 1.25), 
+                                                        (ta - tb) / pow (n, 2));
+        n *= 2;
+    }
+    n = 500;
+    printf("\nOrdenacion por Shell | Knuth\n");
+    printf("%11sn%12st(n)%10st(n)/n%4st(n)/nlog(n)%6st(n)/n^3/2\n", "", "", "", "", "");
+    while (n <= 32000) {
+        aleatorio(v, n);
+        rellenar_v_knuth(inc, &m_knuth, n);
+        tb = microsegundos();
+        ord_shell(v, n, inc, m_knuth);
+        ta = microsegundos();
+        printf("%12d\t%12.3f\t%12.8f\t%12.8f\t%12.8f\n", n, ta - tb, 
+                                                        (ta - tb) / n,
+                                                        (ta - tb) / (n * log(n)), 
+                                                        (ta - tb) / pow (n, 1.5));
 
-    rellenar_v_knuth(inc, &m_knuth, n);
-    
-    rellenar_v_sedgewick(inc, &m_sedgewick, n);
-    
-    rellenar_v_ciura(inc, &m_ciura, n);
-    
+        n *= 2;
+    }
+    n = 500;
+    printf("\nOrdenacion por Shell | Sedgewick\n");
+    printf("%11sn%12st(n)%10st(n)/n%4st(n)/nlog(n)%5st(n)/n^3/2\n", "", "", "", "", "");
+    while (n <= 32000) {
+        aleatorio(v, n);
+        rellenar_v_sedgewick(inc, &m_sedgewick, n);
+        tb = microsegundos();
+        ord_shell(v, n, inc, m_sedgewick);
+        ta = microsegundos();
+        printf("%12d\t%12.3f\t%12.8f\t%12.8f\t%12.8f\n", n, ta - tb, 
+                                                        (ta - tb) / n,
+                                                        (ta - tb) / (n * log(n)), 
+                                                        (ta - tb) / pow (n, 1.5));
+        n *= 2;
+    }
+    n = 500;
+    printf("\nOrdenacion por Shell | Ciura\n");
+    printf("%11sn%12st(n)%10st(n)/n%4st(n)/nlog(n)%5st(n)/n^3/2\n", "", "", "", "", "");
+    while (n <= 32000) {
+        aleatorio(v, n);
+        rellenar_v_ciura(inc, &m_ciura, n);
+        tb = microsegundos();
+        ord_shell(v, n, inc, m_ciura);
+        ta = microsegundos();
+        printf("%12d\t%12.3f\t%12.8f\t%12.8f\t%12.8f\n", n, ta - tb, 
+                                                        (ta - tb) / n,
+                                                        (ta - tb) / (n * log(n)), 
+                                                        (ta - tb) / pow (n, 1.5));
+        n *= 2;
+    }
 }
 
 
@@ -252,13 +321,4 @@ int main() {
     shell_test();
 
     return 0;
-
-
-
-
-
-    // for (int i = 0; i < m_hibbard; i++) {
-    //     printf("%d ", inc[i]);
-    // }
-    // printf("\n%d\n", m_hibbard);
 }
